@@ -12,7 +12,7 @@ namespace MiniMaxi
 
 		IGameState MakeMove(IGameMove gameMove, IGameState gameState);
 
-		Boolean IsMovePossible(IGameState state, IGameMove move);
+		Boolean IsMovePossible(IGameState state);
 
 		Boolean IsTie(IGameState state);
 

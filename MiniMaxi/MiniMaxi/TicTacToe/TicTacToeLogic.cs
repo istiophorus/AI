@@ -10,6 +10,11 @@ namespace MiniMaxi.TicTacToe
 	{
 		public TicTacToeLogic(IGameStateEvaluator evaluator)
 		{
+			if (null == evaluator)
+			{
+				throw new ArgumentNullException("evaluator");
+			}
+
 			_evaluator = evaluator;
 		}
 
@@ -17,6 +22,11 @@ namespace MiniMaxi.TicTacToe
 
 		public IGameMove[] GetPossibleMoves(IGameState gameState, GamePlayer player)
 		{
+			if (null == gameState)
+			{
+				throw new ArgumentNullException("gameState");
+			}
+
 			TicTacToeState state = (TicTacToeState)gameState;
 
 			List<IGameMove> results = new List<IGameMove>(9);
@@ -73,16 +83,19 @@ namespace MiniMaxi.TicTacToe
 			return newState;
 		}
 
-		public Boolean IsMovePossible(IGameState state, IGameMove move)
+		public Boolean IsMovePossible(IGameState state)
 		{
-			throw new NotImplementedException();
+			IGameMove[] moves = GetPossibleMoves(state, GamePlayer.PlayerMax);
+
+			return moves.Length > 0;
 		}
 
 		public Boolean IsTie(IGameState state)
 		{
-			IGameMove[] moves = GetPossibleMoves(state, GamePlayer.PlayerMax);
-
-			return moves.Length <= 0;
+			return
+				!IsMovePossible(state) &&
+				!IsPlayerMaxWinner(state) &&
+				!IsPlayerMinWinner(state);
 		}
 
 		public Boolean IsPlayerMaxWinner(IGameState state)
@@ -99,7 +112,7 @@ namespace MiniMaxi.TicTacToe
 		{
 			return IsPlayerMaxWinner(state) ||
 				IsPlayerMinWinner(state) ||
-				IsTie(state);
+				!IsMovePossible(state);
 		}
 	}
 }

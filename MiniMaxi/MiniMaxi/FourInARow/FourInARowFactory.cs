@@ -15,7 +15,7 @@ namespace MiniMaxi.FourInARow
 
 		public IGameLogic CreateLogic()
 		{
-			return new FourInARowLogic();
+			return new FourInARowLogic(CreateStateEvaluator());
 		}
 
 		public IGameStateEvaluator CreateStateEvaluator()

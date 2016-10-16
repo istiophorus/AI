@@ -7,6 +7,18 @@ namespace MiniMaxi.FourInARow
 {
 	public sealed class FourInARowLogic : IGameLogic
 	{
+		private readonly IGameStateEvaluator _evaluator;
+
+		public FourInARowLogic(IGameStateEvaluator evaluator)
+		{
+			if (null == evaluator)
+			{
+				throw new ArgumentNullException("evaluator");
+			}
+
+			_evaluator = evaluator;
+		}
+
 		public IGameMove[] GetPossibleMoves(IGameState gameState, GamePlayer player)
 		{
 			if (null == gameState)
@@ -35,32 +47,55 @@ namespace MiniMaxi.FourInARow
 
 		public IGameState MakeMove(IGameMove gameMove, IGameState gameState)
 		{
-			throw new NotImplementedException();
+			if (null == gameState)
+			{
+				throw new ArgumentNullException("gameState");
+			}
+
+			if (null == gameMove)
+			{
+				throw new ArgumentNullException("gameMove");
+			}
+
+			FourInARowMove move = (FourInARowMove)gameMove;
+
+			FourInARowState state = (FourInARowState)gameState;
+
+			//if ()
+
+			throw new Exception();
 		}
 
-		public Boolean IsMovePossible(IGameState state, IGameMove move)
+		public Boolean IsMovePossible(IGameState state)
 		{
-			throw new NotImplementedException();
+			IGameMove[] moves = GetPossibleMoves(state, GamePlayer.PlayerMax);
+
+			return moves.Length > 0;
 		}
 
 		public Boolean IsTie(IGameState state)
 		{
-			throw new NotImplementedException();
+			return
+				!IsMovePossible(state) &&
+				!IsPlayerMaxWinner(state) &&
+				!IsPlayerMinWinner(state);
 		}
 
 		public Boolean IsPlayerMaxWinner(IGameState state)
 		{
-			throw new NotImplementedException();
+			return _evaluator.Evaluate(state) > 0;
 		}
 
 		public Boolean IsPlayerMinWinner(IGameState state)
 		{
-			throw new NotImplementedException();
+			return _evaluator.Evaluate(state) < 0;
 		}
 
 		public Boolean IsFinished(IGameState state)
 		{
-			throw new NotImplementedException();
+			return IsPlayerMaxWinner(state) ||
+				IsPlayerMinWinner(state) ||
+				!IsMovePossible(state);
 		}
 	}
 }

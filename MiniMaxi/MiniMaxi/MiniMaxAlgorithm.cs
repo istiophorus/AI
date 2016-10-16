@@ -97,7 +97,7 @@ namespace MiniMaxi
 
 					if (stateRate != 0 /* */)
 					{
-						rates[q] = stateRate * (depth + 1);
+						rates[q] = AdjustStateRate(depth, stateRate);
 					}
 					else
 					{
@@ -111,7 +111,9 @@ namespace MiniMaxi
 						}
 						else
 						{
-							rates[q] = _moveEvaluator.Evaluate(gameState, nextMove, newState) * (depth + 1);
+							stateRate = _moveEvaluator.Evaluate(gameState, nextMove, newState);
+
+							rates[q] = AdjustStateRate(depth, stateRate);
 						}
 					}
 				});
@@ -155,6 +157,11 @@ namespace MiniMaxi
 					Move = moves[index],
 					MoveRate = rates[index]
 				};
+		}
+
+		private static Int32 AdjustStateRate(Int32 depth, Int32 stateRate)
+		{
+			return (Int32)(Math.Sign(stateRate) * (Math.Abs(stateRate) + depth));
 		}
 
 		public IGameMove FindBestMove(IGameState gameState, GamePlayer player)

@@ -14,6 +14,14 @@ namespace MiniMaxi.FourInARow
 
 		private readonly Int32[] _nextMoveIndexes;
 
+		internal Int32[] Indexes
+		{
+			get
+			{
+				return _nextMoveIndexes;
+			}
+		}
+
 		public FourInARowState()
 		{
 			_fields = new FourInARowFieldState[ColumnCount][];
@@ -35,7 +43,7 @@ namespace MiniMaxi.FourInARow
 
 			_nextMoveIndexes = (Int32[])source._nextMoveIndexes.Clone();
 
-			_fields = new FourInARowFieldState[7][];
+			_fields = new FourInARowFieldState[ColumnCount][];
 
 			for (Int32 q = 0; q < _fields.Length; q++)
 			{
@@ -45,6 +53,12 @@ namespace MiniMaxi.FourInARow
 
 		private FourInARowFieldState[][] _fields;
 
-		internal FourInARowFieldState[][] Fields { get; private set; }
+		internal FourInARowFieldState[][] Fields
+		{
+			get
+			{
+				return _fields;
+			}
+		}
 	}
 }

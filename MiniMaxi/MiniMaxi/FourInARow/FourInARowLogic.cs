@@ -61,9 +61,28 @@ namespace MiniMaxi.FourInARow
 
 			FourInARowState state = (FourInARowState)gameState;
 
-			//if ()
+			if (move.Column < 0 || move.Column >= FourInARowState.ColumnCount)
+			{
+				throw new ArgumentOutOfRangeException("column " + move.Column);
+			}
 
-			throw new Exception();
+			Int32 nextField = state.Indexes[move.Column];
+
+			if (nextField < FourInARowState.RowCount && 
+				state.Fields[move.Column][nextField] == FourInARowFieldState.Empty)
+			{
+				FourInARowState newState = new FourInARowState(state);
+
+				newState.Fields[move.Column][nextField] = move.State;
+
+				newState.Indexes[move.Column]++;
+
+				return newState;
+			}
+			else
+			{
+				throw new InvalidOperationException(String.Format("Move not allowed {0} {1}", move.Column, nextField));
+			}
 		}
 
 		public Boolean IsMovePossible(IGameState state)

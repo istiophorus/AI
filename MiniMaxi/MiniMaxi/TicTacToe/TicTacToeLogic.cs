@@ -100,12 +100,12 @@ namespace MiniMaxi.TicTacToe
 
 		public Boolean IsPlayerMaxWinner(IGameState state)
 		{
-			return _evaluator.Evaluate(state) > 0;
+			return _evaluator.Evaluate(state, GamePlayer.PlayerMax) > 0;
 		}
 
 		public Boolean IsPlayerMinWinner(IGameState state)
 		{
-			return _evaluator.Evaluate(state) < 0;
+			return _evaluator.Evaluate(state, GamePlayer.PlayerMax) < 0;
 		}
 
 		public Boolean IsFinished(IGameState state)

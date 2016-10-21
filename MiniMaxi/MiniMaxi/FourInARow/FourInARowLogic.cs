@@ -30,9 +30,9 @@ namespace MiniMaxi.FourInARow
 
 			List<IGameMove> moves = new List<IGameMove>();
 
-			for (Int32 q = 0, mq = state.Fields.Length; q < mq; q++)
+			for (Int32 q = 0, mq = FourInARowState.ColumnCount ; q < mq; q++)
 			{
-				if (state.Fields[q][state.Fields[q].Length - 1] != FourInARowFieldState.Empty)
+				if (state.Get(q, FourInARowState.RowCount - 1) == FourInARowFieldState.Empty)
 				{
 					moves.Add(new FourInARowMove
 						{
@@ -69,13 +69,11 @@ namespace MiniMaxi.FourInARow
 			Int32 nextField = state.Indexes[move.Column];
 
 			if (nextField < FourInARowState.RowCount && 
-				state.Fields[move.Column][nextField] == FourInARowFieldState.Empty)
+				state.Get(move.Column, nextField) == FourInARowFieldState.Empty)
 			{
 				FourInARowState newState = new FourInARowState(state);
 
-				newState.Fields[move.Column][nextField] = move.State;
-
-				newState.Indexes[move.Column]++;
+				newState.Set(move.Column, nextField, move.State);
 
 				return newState;
 			}
@@ -102,12 +100,12 @@ namespace MiniMaxi.FourInARow
 
 		public Boolean IsPlayerMaxWinner(IGameState state)
 		{
-			return _evaluator.Evaluate(state) > 0;
+			return _evaluator.Evaluate(state, GamePlayer.PlayerMax) >= FourInARowEvaluator.WinValue;
 		}
 
 		public Boolean IsPlayerMinWinner(IGameState state)
 		{
-			return _evaluator.Evaluate(state) < 0;
+			return _evaluator.Evaluate(state, GamePlayer.PlayerMin) <= -FourInARowEvaluator.WinValue;
 		}
 
 		public Boolean IsFinished(IGameState state)

@@ -11,5 +11,10 @@ namespace MiniMaxi.FourInARow
 		public Int32 Column { get; set; }
 
 		public FourInARowFieldState State { get; set; }
+
+		public override String ToString()
+		{
+			return String.Format("[{0};{1}]", Column, State);
+		}
 	}
 }

@@ -10,6 +10,8 @@ namespace MiniMaxi.FourInARow
 	{
 		internal static readonly Int32 ColumnCount = 7;
 
+		internal static readonly Int32 MiddleColumn = ColumnCount / 2;
+
 		internal static readonly Int32 RowCount = 6;
 
 		private readonly Int32[] _nextMoveIndexes;
@@ -53,12 +55,69 @@ namespace MiniMaxi.FourInARow
 
 		private FourInARowFieldState[][] _fields;
 
-		internal FourInARowFieldState[][] Fields
+		private Int32[] _crossesInRow = new Int32[RowCount];
+
+		internal Int32[] CrossesInRow
 		{
 			get
 			{
-				return _fields;
+				return _crossesInRow;
 			}
+		}
+
+		private Int32[] _circlesInRow = new Int32[RowCount];
+
+		internal Int32[] CirclesInRow
+		{
+			get
+			{
+				return _circlesInRow;
+			}
+		}
+
+		private Int32[] _crossesInColumn = new Int32[ColumnCount];
+
+		internal Int32[] CrossesInColumn
+		{
+			get
+			{
+				return _crossesInColumn;
+			}
+		}
+
+		private Int32[] _circlesInColumn = new Int32[ColumnCount];
+
+		internal Int32[] CirclesInColumn
+		{
+			get
+			{
+				return _circlesInColumn;
+			}
+		}
+
+		internal void Set(Int32 x, Int32 y, FourInARowFieldState state)
+		{
+			_fields[x][y] = state;
+
+			_nextMoveIndexes[x]++;
+
+			if (state == FourInARowFieldState.Cross)
+			{
+				_crossesInRow[y]++;
+				_crossesInColumn[x]++;
+			}
+			else if (state == FourInARowFieldState.Circle)
+			{
+				_circlesInRow[y]++;
+				_circlesInColumn[x]++;
+			}
+		}
+
+		internal FourInARowFieldState Get(Int32 x, Int32 y)
+		{
+			return _fields[x][y];
 		}
 	}
 }
+
+

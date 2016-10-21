@@ -12,13 +12,13 @@ namespace MiniMaxi
 	{
 		private static void PrintState(FourInARowState state)
 		{
-			for (Int32 y = 0, my = 3; y < my; y++)
+			for (Int32 y = FourInARowState.RowCount - 1; y >= 0; y--)
 			{
-				for (Int32 x = 0, mx = 3; x < mx; x++)
+				for (Int32 x = 0, mx = FourInARowState.ColumnCount; x < mx; x++)
 				{
 					String text;
 
-					switch (state.Fields[x][y])
+					switch (state.Get(x, y))
 					{
 						case FourInARowFieldState.Cross:
 							text = "X";
@@ -85,7 +85,7 @@ namespace MiniMaxi
 
 			IGameLogic logic = factory.CreateLogic();
 
-			MiniMaxAlgorithm alg = new MiniMaxAlgorithm(5, factory);
+			MiniMaxAlgorithmImproved alg = new MiniMaxAlgorithmImproved(5, factory);
 
 			IGameState state = new FourInARowState();
 
@@ -132,7 +132,7 @@ namespace MiniMaxi
 
 			IGameLogic logic = factory.CreateLogic();
 
-			MiniMaxAlgorithm alg = new MiniMaxAlgorithm(3, factory);
+			MiniMaxAlgorithm alg = new MiniMaxAlgorithm(5, factory);
 
 			IGameState state = new TicTacToeState();
 

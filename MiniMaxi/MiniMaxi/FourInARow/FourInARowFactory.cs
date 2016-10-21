@@ -10,7 +10,7 @@ namespace MiniMaxi.FourInARow
 	{
 		public IGameMoveEvaluator CreateMoveEvaluator()
 		{
-			return new FourInARowEvaluator();
+			throw new NotSupportedException();
 		}
 
 		public IGameLogic CreateLogic()

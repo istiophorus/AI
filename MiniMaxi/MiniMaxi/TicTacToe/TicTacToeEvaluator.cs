@@ -308,7 +308,7 @@ namespace MiniMaxi.TicTacToe
 			return resultValue;
 		}
 
-		public Int32 Evaluate(IGameState gameState)
+		public Int32 Evaluate(IGameState gameState, GamePlayer player)
 		{
 			TicTacToeState state = (TicTacToeState)gameState;
 

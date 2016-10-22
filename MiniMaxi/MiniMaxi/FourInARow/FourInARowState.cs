@@ -117,6 +117,40 @@ namespace MiniMaxi.FourInARow
 		{
 			return _fields[x][y];
 		}
+
+		public override String ToString()
+		{
+			StringBuilder sb = new StringBuilder(1024);
+
+			for (Int32 y = FourInARowState.RowCount - 1; y >= 0; y--)
+			{
+				for (Int32 x = 0, mx = FourInARowState.ColumnCount; x < mx; x++)
+				{
+					String text;
+
+					switch (Get(x, y))
+					{
+						case FourInARowFieldState.Cross:
+							text = "X";
+							break;
+
+						case FourInARowFieldState.Circle:
+							text = "O";
+							break;
+
+						default:
+							text = "_";
+							break;
+					}
+
+					sb.Append(text);
+				}
+
+				sb.Append(Environment.NewLine);
+			}
+
+			return sb.ToString();
+		}
 	}
 }
 

@@ -84,9 +84,9 @@ namespace MiniMaxi
 
 			Int32[] rates = new Int32[moves.Length];
 
-			//Parallel.For(0, moves.Length, q =>
+			Parallel.For(0, moves.Length, q =>
 
-			for (Int32 q = 0; q < moves.Length; q++)
+			//for (Int32 q = 0; q < moves.Length; q++)
 				{
 					IGameMove nextMove = moves[q];
 
@@ -94,7 +94,7 @@ namespace MiniMaxi
 
 					rates[q] = FindMoveScore(newState, OtherPlayer(currentPlayer), depth - 1);
 				}
-			//);
+			);
 
 			if (currentPlayer == GamePlayer.PlayerMax)
 			{
@@ -121,17 +121,23 @@ namespace MiniMaxi
 
 			Int32[] rates = new Int32[moves.Length];
 
-			//Parallel.For(0, moves.Length, q =>
+			Console.WriteLine();
 
-			for (Int32 q = 0; q < moves.Length; q++)
+			Parallel.For(0, moves.Length, q =>
+
+			//for (Int32 q = 0; q < moves.Length; q++)
 			{
 				IGameMove nextMove = moves[q];
 
 				IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
 
 				rates[q] = FindMoveScore(newState, OtherPlayer(currentPlayer), _depth - 1);
+
+				//Console.Write("{0} ", rates[q]);
 			}
-			//);
+			);
+
+			Console.WriteLine();
 
 			Int32 index = -1;
 			Int32 rate = 0;

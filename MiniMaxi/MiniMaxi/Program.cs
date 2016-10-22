@@ -76,7 +76,60 @@ namespace MiniMaxi
 
 		static void Main(String[] args)
 		{
+			//PlayFourInARowTest();
+
 			PlayFourInARow();
+		}
+
+		private static void PlayFourInARowTest()
+		{
+			//String[] input = new[] 
+			//	{
+			//		"oo.o...",
+			//		"x......",
+			//		"x......",
+			//		".......",
+			//		".......",
+			//		".......",
+			//	};
+
+			//String[] input = new[] 
+			//	{
+			//		"oooxooo",
+			//		"xxxoxxx",
+			//		"oooxooo",
+			//		"xxxoxxx",
+			//		"xoxoxox",
+			//		"oo.o...",
+			//	};
+
+			String[] input = new[] 
+				{
+					"oooxooo",
+					"xxxoxxx",
+					"oooxooo",
+					"xxxoxxx",
+					"xoxoxox",
+					"oo.o...",
+				};
+
+			FourInARowState state = FourInARowTests.PrepareState(input);
+
+			FourInARowFactory factory = new FourInARowFactory();
+
+			IGameLogic logic = factory.CreateLogic();
+
+			MiniMaxAlgorithmImproved alg = new MiniMaxAlgorithmImproved(3, factory);
+
+			PrintState((FourInARowState)state);
+
+			Int32 res = factory.CreateStateEvaluator().Evaluate(state, GamePlayer.PlayerMax);
+
+			IGameMove move = alg.FindBestMove(state, GamePlayer.PlayerMax);
+
+			IGameState newState = logic.MakeMove(move, state);
+
+			PrintState((FourInARowState)newState);
 		}
 
 		private static void PlayFourInARow()
@@ -85,7 +138,7 @@ namespace MiniMaxi
 
 			IGameLogic logic = factory.CreateLogic();
 
-			MiniMaxAlgorithmImproved alg = new MiniMaxAlgorithmImproved(5, factory);
+			MiniMaxAlgorithmImproved alg = new MiniMaxAlgorithmImproved(6, factory);
 
 			IGameState state = new FourInARowState();
 

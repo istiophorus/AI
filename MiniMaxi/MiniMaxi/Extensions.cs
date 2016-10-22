@@ -19,7 +19,7 @@ namespace MiniMaxi
 
 			T maxValue = default(T);
 
-			for (Int32 q = 1, mq = input.Length; q < mq; q++)
+			for (Int32 q = 0, mq = input.Length; q < mq; q++)
 			{
 				T item = input[q];
 
@@ -44,7 +44,7 @@ namespace MiniMaxi
 
 			T minValue = default(T);
 
-			for (Int32 q = 1, mq = input.Length; q < mq; q++)
+			for (Int32 q = 0, mq = input.Length; q < mq; q++)
 			{
 				T item = input[q];
 

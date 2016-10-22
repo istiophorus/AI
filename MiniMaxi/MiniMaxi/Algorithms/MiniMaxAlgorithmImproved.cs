@@ -4,8 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MiniMaxi.Interfaces;
 
-namespace MiniMaxi
+namespace MiniMaxi.Algorithms
 {
 	/// <summary>
 	/// minimax(s)
@@ -13,7 +14,7 @@ namespace MiniMaxi
 	/// if player(s) == MAX max minimax(result(s, a))
 	/// if player(s) == MIN min minimax(result(s, a))
 	/// </summary>
-	public sealed class MiniMaxAlgorithm
+	public sealed class MiniMaxAlgorithmImproved : IGameAlgorithm
 	{
 		private readonly Int32 _depth;
 
@@ -21,11 +22,9 @@ namespace MiniMaxi
 
 		private readonly IGameFactory _gameFactory;
 
-		private readonly IGameMoveEvaluator _moveEvaluator;
-
 		private readonly IGameStateEvaluator _stateEvaluator;
 
-		public MiniMaxAlgorithm(Int32 depth, IGameFactory gameFactory)
+		public MiniMaxAlgorithmImproved(Int32 depth, IGameFactory gameFactory)
 		{
 			if (depth < 1)
 			{
@@ -42,8 +41,6 @@ namespace MiniMaxi
 			_gameFactory = gameFactory;
 
 			_gameLogic = gameFactory.CreateLogic();
-
-			_moveEvaluator = gameFactory.CreateMoveEvaluator();
 
 			_stateEvaluator = gameFactory.CreateStateEvaluator();
 		}
@@ -63,62 +60,78 @@ namespace MiniMaxi
 			}
 		}
 
-		private sealed class BestMoveInfo
+		private Int32 FindMoveScore(IGameState gameState, GamePlayer currentPlayer, Int32 depth)
 		{
-			internal IGameMove Move { get; set; }
+			if (depth <= 0 || _gameLogic.IsFinished(gameState))
+			{
+				return _stateEvaluator.Evaluate(gameState, currentPlayer);
+			}
 
-			internal Int32 MoveRate { get; set; }
-		}
-
-		private BestMoveInfo FindBestMoveImpl(IGameState gameState, GamePlayer currentPlayer, Int32 depth)
-		{
 			IGameMove[] moves = _gameLogic.GetPossibleMoves(gameState, currentPlayer);
 
 			if (moves.Length <= 0)
 			{
 				//// there are no more possible moves to analyse, so return current state evaluation
 
-				return new BestMoveInfo
-					{
-						MoveRate = _stateEvaluator.Evaluate(gameState, currentPlayer)
-					};
+				return _stateEvaluator.Evaluate(gameState, currentPlayer);
 			}
 
 			Int32[] rates = new Int32[moves.Length];
 
-			//Parallel.For(0, moves.Length, q =>
+			Parallel.For(0, moves.Length, q =>
 
-			for (Int32 q = 0; q < moves.Length; q++)
+			//for (Int32 q = 0; q < moves.Length; q++)
 				{
 					IGameMove nextMove = moves[q];
 
 					IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
 
-					Int32 stateRate = _stateEvaluator.Evaluate(newState, currentPlayer);
-
-					if (stateRate != 0 /* */)
-					{
-						rates[q] = AdjustStateRate(depth, stateRate);
-					}
-					else
-					{
-						if (depth > 0)
-						{
-							BestMoveInfo bestMoveInfo = FindBestMoveImpl(newState, OtherPlayer(currentPlayer), depth - 1);
-
-							bestMoveInfo.Move = nextMove;
-
-							rates[q] = bestMoveInfo.MoveRate;
-						}
-						else
-						{
-							stateRate = _moveEvaluator.Evaluate(gameState, nextMove, newState);
-
-							rates[q] = AdjustStateRate(depth, stateRate);
-						}
-					}
+					rates[q] = FindMoveScore(newState, OtherPlayer(currentPlayer), depth - 1);
 				}
-			//);
+			);
+
+			if (currentPlayer == GamePlayer.PlayerMax)
+			{
+				return rates.FindFirstMax().Item2;
+			}
+			else if (currentPlayer == GamePlayer.PlayerMin)
+			{
+				return rates.FindFirstMin().Item2;
+			}
+			else
+			{
+				throw new NotSupportedException(currentPlayer.ToString());
+			}
+		}
+
+		private IGameMove FindBestMoveImpl(IGameState gameState, GamePlayer currentPlayer)
+		{
+			IGameMove[] moves = _gameLogic.GetPossibleMoves(gameState, currentPlayer);
+
+			if (moves.Length <= 0)
+			{
+				return null;
+			}
+
+			Int32[] rates = new Int32[moves.Length];
+
+			Console.WriteLine();
+
+			Parallel.For(0, moves.Length, q =>
+
+			//for (Int32 q = 0; q < moves.Length; q++)
+			{
+				IGameMove nextMove = moves[q];
+
+				IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
+
+				rates[q] = FindMoveScore(newState, OtherPlayer(currentPlayer), _depth - 1);
+
+				//Console.Write("{0} ", rates[q]);
+			}
+			);
+
+			Console.WriteLine();
 
 			Int32 index = -1;
 			Int32 rate = 0;
@@ -183,11 +196,7 @@ namespace MiniMaxi
 				index = equalRate[Environment.TickCount % equalRate.Count];
 			}
 
-			return new BestMoveInfo
-				{
-					Move = moves[index],
-					MoveRate = rates[index]
-				};
+			return moves[index];
 		}
 
 		private static Int32 AdjustStateRate(Int32 depth, Int32 stateRate)
@@ -197,9 +206,7 @@ namespace MiniMaxi
 
 		public IGameMove FindBestMove(IGameState gameState, GamePlayer player)
 		{
-			BestMoveInfo bestMoveInfo = FindBestMoveImpl(gameState, player, _depth);
-
-			return bestMoveInfo.Move;
+			return FindBestMoveImpl(gameState, player);
 		}
 	}
 }

@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Algorithms\MiniMaxWithAlfaBetaPrunning.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FourInARowTests.cs" />
     <Compile Include="FourInARow\FourInARowFactory.cs" />
@@ -50,15 +51,16 @@
     <Compile Include="FourInARow\FourInARowEvaluator.cs" />
     <Compile Include="FourInARow\FourInARowMove.cs" />
     <Compile Include="FourInARow\FourInARowState.cs" />
-    <Compile Include="GamePlayers.cs" />
-    <Compile Include="IGameFactory.cs" />
-    <Compile Include="IGameLogic.cs" />
-    <Compile Include="IGameMove.cs" />
-    <Compile Include="IGameMoveEvaluator.cs" />
-    <Compile Include="IGameState.cs" />
-    <Compile Include="IGameStateEvaluator.cs" />
-    <Compile Include="MiniMaxAlgorithmImproved.cs" />
-    <Compile Include="MiniMaxAlgorithm.cs" />
+    <Compile Include="Interfaces\GamePlayers.cs" />
+    <Compile Include="Interfaces\IGameAlgorithm.cs" />
+    <Compile Include="Interfaces\IGameFactory.cs" />
+    <Compile Include="Interfaces\IGameLogic.cs" />
+    <Compile Include="Interfaces\IGameMove.cs" />
+    <Compile Include="Interfaces\IGameMoveEvaluator.cs" />
+    <Compile Include="Interfaces\IGameState.cs" />
+    <Compile Include="Interfaces\IGameStateEvaluator.cs" />
+    <Compile Include="Algorithms\MiniMaxAlgorithmImproved.cs" />
+    <Compile Include="Algorithms\MiniMaxAlgorithm.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TicTacToe\TicTacToeEvaluator.cs" />

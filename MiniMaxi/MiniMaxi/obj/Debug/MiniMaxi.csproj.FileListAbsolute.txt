@@ -3,4 +3,3 @@ D:\GitHub\AI\MiniMaxi\MiniMaxi\bin\Debug\MiniMaxi.exe
 D:\GitHub\AI\MiniMaxi\MiniMaxi\bin\Debug\MiniMaxi.pdb
 D:\GitHub\AI\MiniMaxi\MiniMaxi\obj\Debug\MiniMaxi.exe
 D:\GitHub\AI\MiniMaxi\MiniMaxi\obj\Debug\MiniMaxi.pdb
-D:\GitHub\AI\MiniMaxi\MiniMaxi\obj\Debug\MiniMaxi.csprojResolveAssemblyReference.cache

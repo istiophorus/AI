@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MiniMaxi
+namespace MiniMaxi.Interfaces
 {
-	public enum GamePlayer
+	public interface IGameAlgorithm
 	{
-		PlayerMax,
-		PlayerMin
+		IGameMove FindBestMove(IGameState gameState, GamePlayer player);
 	}
 }

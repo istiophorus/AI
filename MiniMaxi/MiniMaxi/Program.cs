@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MiniMaxi.Algorithms;
 using MiniMaxi.FourInARow;
+using MiniMaxi.Interfaces;
 using MiniMaxi.TicTacToe;
 
 namespace MiniMaxi

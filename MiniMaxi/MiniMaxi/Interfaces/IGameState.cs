@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MiniMaxi
+namespace MiniMaxi.Interfaces
 {
-	public interface IGameStateEvaluator
+	public interface IGameState
 	{
-		Int32 Evaluate(IGameState gameState, GamePlayer player);
 	}
 }

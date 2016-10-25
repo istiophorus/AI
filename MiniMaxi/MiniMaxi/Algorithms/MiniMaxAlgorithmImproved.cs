@@ -24,7 +24,9 @@ namespace MiniMaxi.Algorithms
 
 		private readonly IGameStateEvaluator _stateEvaluator;
 
-		public MiniMaxAlgorithmImproved(Int32 depth, IGameFactory gameFactory)
+		private readonly Boolean _useParallel;
+
+		public MiniMaxAlgorithmImproved(Int32 depth, IGameFactory gameFactory, Boolean useParallel)
 		{
 			if (depth < 1)
 			{
@@ -35,6 +37,8 @@ namespace MiniMaxi.Algorithms
 			{
 				throw new ArgumentNullException("gameFactory");
 			}
+
+			_useParallel = useParallel;
 
 			_depth = depth;
 
@@ -78,17 +82,26 @@ namespace MiniMaxi.Algorithms
 
 			Int32[] rates = new Int32[moves.Length];
 
-			Parallel.For(0, moves.Length, q =>
-
-			//for (Int32 q = 0; q < moves.Length; q++)
+			Action<Int32> checkSingleMove = moveIndex =>
 				{
-					IGameMove nextMove = moves[q];
+					IGameMove nextMove = moves[moveIndex];
 
 					IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
 
-					rates[q] = FindMoveScore(newState, OtherPlayer(currentPlayer), depth - 1);
+					rates[moveIndex] = FindMoveScore(newState, OtherPlayer(currentPlayer), depth - 1);
+				};
+
+			if (_useParallel)
+			{
+				Parallel.For(0, moves.Length, checkSingleMove);
+			}
+			else
+			{
+				for (Int32 q = 0; q < moves.Length; q++)
+				{
+					checkSingleMove(q);
 				}
-			);
+			}
 
 			if (currentPlayer == GamePlayer.PlayerMax)
 			{
@@ -115,24 +128,32 @@ namespace MiniMaxi.Algorithms
 
 			Int32[] rates = new Int32[moves.Length];
 
-			Console.WriteLine();
+			Action<Int32> checkSingleMove = moveIndex =>
+				{
+					IGameMove nextMove = moves[moveIndex];
 
-			Parallel.For(0, moves.Length, q =>
+					IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
 
-			//for (Int32 q = 0; q < moves.Length; q++)
+					rates[moveIndex] = FindMoveScore(newState, OtherPlayer(currentPlayer), _depth - 1);
+				};
+
+			if (_useParallel)
 			{
-				IGameMove nextMove = moves[q];
-
-				IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
-
-				rates[q] = FindMoveScore(newState, OtherPlayer(currentPlayer), _depth - 1);
-
-				//Console.Write("{0} ", rates[q]);
+				Parallel.For(0, moves.Length, checkSingleMove);
 			}
-			);
+			else
+			{
+				for (Int32 q = 0; q < moves.Length; q++)
+				{
+					checkSingleMove(q);
+				}
+			}
 
-			Console.WriteLine();
+			return ExtractResult(currentPlayer, moves, rates);
+		}
 
+		private static IGameMove ExtractResult(GamePlayer currentPlayer, IGameMove[] moves, Int32[] rates)
+		{
 			Int32 index = -1;
 			Int32 rate = 0;
 

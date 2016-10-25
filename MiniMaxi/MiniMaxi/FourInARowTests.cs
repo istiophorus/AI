@@ -47,7 +47,7 @@ namespace MiniMaxi
 
 			IGameLogic logic = factory.CreateLogic();
 
-			MiniMaxAlgorithmImproved alg = new MiniMaxAlgorithmImproved(3, factory);
+			MiniMaxAlgorithmImproved alg = new MiniMaxAlgorithmImproved(3, factory, true);
 
 			Int32 res = factory.CreateStateEvaluator().Evaluate(state, GamePlayer.PlayerMax);
 

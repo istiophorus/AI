@@ -121,7 +121,7 @@ namespace MiniMaxi
 
 			IGameLogic logic = factory.CreateLogic();
 
-			MiniMaxAlgorithmImproved alg = new MiniMaxAlgorithmImproved(3, factory);
+			MiniMaxAlgorithmImproved alg = new MiniMaxAlgorithmImproved(3, factory, true);
 
 			PrintState((FourInARowState)state);
 
@@ -140,7 +140,7 @@ namespace MiniMaxi
 
 			IGameLogic logic = factory.CreateLogic();
 
-			MiniMaxAlgorithmImproved alg = new MiniMaxAlgorithmImproved(6, factory);
+			IGameAlgorithm alg = new MiniMaxWithAlfaBetaPrunning(8, factory); // new MiniMaxAlgorithmImproved(6, factory, true);
 
 			IGameState state = new FourInARowState();
 

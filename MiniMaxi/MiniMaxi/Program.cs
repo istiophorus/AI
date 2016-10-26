@@ -80,7 +80,16 @@ namespace MiniMaxi
 		{
 			//PlayFourInARowTest();
 
-			PlayFourInARow();
+			try
+			{
+				PlayFourInARow();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+			}
+
+			Console.ReadLine();
 		}
 
 		private static void PlayFourInARowTest()
@@ -140,7 +149,7 @@ namespace MiniMaxi
 
 			IGameLogic logic = factory.CreateLogic();
 
-			IGameAlgorithm alg = new MiniMaxWithAlfaBetaPrunning(8, factory); // new MiniMaxAlgorithmImproved(6, factory, true);
+			IGameAlgorithm alg = new MiniMaxWithAlfaBetaPrunningB(8, factory); // new MiniMaxAlgorithmImproved(6, factory, true);
 
 			IGameState state = new FourInARowState();
 

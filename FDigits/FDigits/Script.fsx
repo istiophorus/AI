@@ -12,4 +12,6 @@ let allTestData = Idx.readAllData @"d:\work_folder\machine_learning\1\unpacked\t
 
 let classifier = Idx.train allData
 
-Idx.verifyModel allTestData classifier
+let smallTestData = Array.sub allTestData 0 10
+
+Idx.verifyModel smallTestData classifier

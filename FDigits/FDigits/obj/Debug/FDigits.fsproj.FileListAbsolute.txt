@@ -1,0 +1,7 @@
+D:\GitHub\AI\FDigits\FDigits\bin\Debug\FDigits.XML
+D:\GitHub\AI\FDigits\FDigits\bin\Debug\FDigits.dll
+D:\GitHub\AI\FDigits\FDigits\bin\Debug\FDigits.pdb
+D:\GitHub\AI\FDigits\FDigits\bin\Debug\FSharp.Core.dll
+D:\GitHub\AI\FDigits\FDigits\bin\Debug\FSharp.Core.xml
+D:\GitHub\AI\FDigits\FDigits\obj\Debug\FDigits.dll
+D:\GitHub\AI\FDigits\FDigits\obj\Debug\FDigits.pdb

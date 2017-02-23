@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using MiniMaxi.Interfaces;
 
 namespace MiniMaxi.FourInARow
@@ -25,6 +22,8 @@ namespace MiniMaxi.FourInARow
 			}
 		}
 
+        private readonly Char[] _stateDesc;
+
 		public FourInARowState()
 		{
 			_fields = new FourInARowFieldState[ColumnCount][];
@@ -35,9 +34,28 @@ namespace MiniMaxi.FourInARow
 			{
 				_fields[q] = new FourInARowFieldState[RowCount];
 			}
-		}
 
-		internal FourInARowState(FourInARowState source)
+            _stateDesc = new Char[RowCount * ColumnCount];
+
+            for (Int32 q = 0; q < _stateDesc.Length; q++)
+            {
+                _stateDesc[q] = GetStateDesc(FourInARowFieldState.Empty);
+            }
+        }
+
+        private static Char GetStateDesc(FourInARowFieldState state)
+        {
+            switch (state)
+            {
+                case FourInARowFieldState.Empty: return 'E';
+                case FourInARowFieldState.Circle: return 'O';
+                case FourInARowFieldState.Cross: return 'X';
+                default:
+                    throw new NotSupportedException(state.ToString());
+            }
+        }
+
+        internal FourInARowState(FourInARowState source)
 		{
 			if (null == source)
 			{
@@ -52,7 +70,9 @@ namespace MiniMaxi.FourInARow
 			{
 				_fields[q] = (FourInARowFieldState[])source._fields[q].Clone();
 			}
-		}
+
+            _stateDesc = (Char[])source._stateDesc.Clone();
+        }
 
 		private FourInARowFieldState[][] _fields;
 
@@ -96,9 +116,19 @@ namespace MiniMaxi.FourInARow
 			}
 		}
 
-		internal void Set(Int32 x, Int32 y, FourInARowFieldState state)
+        public String Key
+        {
+            get
+            {
+                return new String(_stateDesc);
+            }
+        }
+
+        internal void Set(Int32 x, Int32 y, FourInARowFieldState state)
 		{
 			_fields[x][y] = state;
+
+            _stateDesc[x + ColumnCount * y] = GetStateDesc(state);
 
 			_nextMoveIndexes[x]++;
 

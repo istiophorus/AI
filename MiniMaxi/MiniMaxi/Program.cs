@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MiniMaxi.Algorithms;
 using MiniMaxi.FourInARow;
 using MiniMaxi.Interfaces;
@@ -149,7 +145,7 @@ namespace MiniMaxi
 
 			IGameLogic logic = factory.CreateLogic();
 
-			IGameAlgorithm alg = new MiniMaxWithAlfaBetaPrunningB(8, factory); // new MiniMaxAlgorithmImproved(6, factory, true);
+            IGameAlgorithm alg = new MiniMaxWithAlfaBetaPrunningDynamic(9, factory); /// new MiniMaxWithAlfaBetaPrunningB(8, factory); // new MiniMaxAlgorithmImproved(6, factory, true);
 
 			IGameState state = new FourInARowState();
 

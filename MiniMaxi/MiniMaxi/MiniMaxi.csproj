@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithms\MiniMaxWithAlfaBetaPrunning.cs" />
+    <Compile Include="Algorithms\MiniMaxWithAlfaBetaPrunningDynamic.cs" />
     <Compile Include="Algorithms\MiniMaxWithAlfaBetaPrunningB.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FourInARowTests.cs" />

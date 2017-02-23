@@ -20,7 +20,15 @@ namespace MiniMaxi.TicTacToe
 
 		public TicTacToeFieldState[][] Fields { get; private set; }
 
-		public Object Clone()
+        public String Key
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public Object Clone()
 		{
 			TicTacToeState result = new TicTacToeState
 				{

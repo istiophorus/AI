@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MiniMaxi.Interfaces;
 
 namespace MiniMaxi.Algorithms
@@ -75,23 +72,43 @@ namespace MiniMaxi.Algorithms
 			}
 		}
 
-		private Int32 FindMoveScore(IGameState gameState, GamePlayer currentPlayer, Int32 depth, Int32 alfa, Int32 beta, Dictionary<String, Int32> ratesMap)
+        private static readonly Double FutureDiscount = 0.9;
+
+        private Int32 FindMoveScore(IGameState gameState, GamePlayer currentPlayer, Int32 depth, Int32 alfa, Int32 beta, Dictionary<String, Int32> ratesMap)
 		{
-			if (depth <= 0 || _gameLogic.IsFinished(gameState))
+            Int32 result;
+
+            if (depth <= 0 || _gameLogic.IsFinished(gameState))
 			{
-				return _stateEvaluator.Evaluate(gameState, currentPlayer);
-			}
+                result = _stateEvaluator.Evaluate(gameState, currentPlayer);
+
+                //Console.WriteLine();
+
+                //Console.WriteLine(result);
+
+                //Console.WriteLine(gameState.ToString());
+
+                //Console.WriteLine();
+
+                //ratesMap[gameState.Key] = result;
+
+                return result;
+            }
 
 			IGameMove[] moves = _gameLogic.GetPossibleMoves(gameState, currentPlayer);
 
 			if (moves.Length <= 0)
 			{
-				//// there are no more possible moves to analyse, so return current state evaluation
+                //// there are no more possible moves to analyse, so return current state evaluation
 
-				return _stateEvaluator.Evaluate(gameState, currentPlayer);
-			}
+                result = _stateEvaluator.Evaluate(gameState, currentPlayer);
 
-			if (currentPlayer == GamePlayer.PlayerMax)
+                //ratesMap[gameState.Key] = result;
+
+                return result;
+            }
+
+            if (currentPlayer == GamePlayer.PlayerMax)
 			{
 				Int32 maxMoveScore = Int32.MinValue;
 
@@ -101,30 +118,32 @@ namespace MiniMaxi.Algorithms
 
 					IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
 
-                    Int32 moveScore;
+                    Int32 rawMoveScore;
 
-                    if (!ratesMap.TryGetValue(newState.Key, out moveScore))
+                    if (!ratesMap.TryGetValue(newState.Key, out rawMoveScore))
                     {
-                        moveScore = FindMoveScore(newState, OtherPlayer(currentPlayer), depth - 1, alfa, beta, ratesMap);
-
-                        ratesMap.Add(newState.Key, moveScore);
+                        rawMoveScore = FindMoveScore(newState, OtherPlayer(currentPlayer), depth - 1, alfa, beta, ratesMap);
                     }
                     else
                     {
 
                     }
 
-					maxMoveScore = Math.Max(maxMoveScore, moveScore);
+                    Int32 moveScore = (Int32)(rawMoveScore * FutureDiscount);
+
+                    maxMoveScore = Math.Max(maxMoveScore, moveScore);
 
 					alfa = Math.Max(alfa, maxMoveScore);
 
-					if (beta <= alfa)
-					{
-						break;
-					}
-				}
+                    if (beta <= alfa)
+                    {
+                        break;
+                    }
+                }
 
-				return maxMoveScore;
+                // ratesMap[gameState.Key] = maxMoveScore;
+
+                result = maxMoveScore;
 			}
 			else if (currentPlayer == GamePlayer.PlayerMin)
 			{
@@ -133,40 +152,43 @@ namespace MiniMaxi.Algorithms
 				for (Int32 q = 0; q < moves.Length; q++)
 				{
 					IGameMove nextMove = moves[q];
-
+                     
 					IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
 
-                    Int32 moveScore;
+                    Int32 rawMoveScore;
 
-                    if (!ratesMap.TryGetValue(newState.Key, out moveScore))
+                    if (!ratesMap.TryGetValue(newState.Key, out rawMoveScore))
                     {
-                        moveScore = FindMoveScore(newState, OtherPlayer(currentPlayer), depth - 1, alfa, beta, ratesMap);
-
-                        ratesMap.Add(newState.Key, moveScore);
+                        rawMoveScore = FindMoveScore(newState, OtherPlayer(currentPlayer), depth - 1, alfa, beta, ratesMap);
                     }
                     else
                     {
 
                     }
 
+                    Int32 moveScore = (Int32)(rawMoveScore * FutureDiscount);
 
                     minMoveScore = Math.Min(minMoveScore, moveScore);
 
 					beta = Math.Min(beta, minMoveScore);
 
-					if (beta <= alfa)
-					{
-						break;
-					}
-				}
+                    if (beta <= alfa)
+                    {
+                        break;
+                    }
+                }
 
-				return minMoveScore;
+                // ratesMap[gameState.Key] = minMoveScore;
+
+                result = minMoveScore;
 			}
 			else
 			{
 				throw new NotSupportedException(currentPlayer.ToString());
 			}
-		}
+
+            return result;
+        }
 
 		private IGameMove FindBestMoveImpl(IGameState gameState, GamePlayer currentPlayer, Dictionary<String, Int32> ratesMap)
 		{
@@ -183,7 +205,9 @@ namespace MiniMaxi.Algorithms
 
 			IGameMove selectedMove = null;
 
-			if (currentPlayer == GamePlayer.PlayerMax)
+            //Console.WriteLine();
+
+            if (currentPlayer == GamePlayer.PlayerMax)
 			{
 				Int32 maxMoveScore = Int32.MinValue;
 
@@ -193,9 +217,13 @@ namespace MiniMaxi.Algorithms
 
 					IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
 
-					Int32 moveScore = FindMoveScore(newState, OtherPlayer(currentPlayer), _depth - 1, alfa, beta, ratesMap);
+					Int32 moveScore = (Int32)(FindMoveScore(newState, OtherPlayer(currentPlayer), _depth - 1, alfa, beta, ratesMap) * FutureDiscount);
 
-					if (moveScore > alfa || selectedMove == null)
+                    //Console.WriteLine("{0} ", moveScore);
+
+                    //Console.WriteLine(newState.ToString());
+
+                    if (moveScore > alfa || selectedMove == null)
 					{
 						maxMoveScore = Math.Max(maxMoveScore, moveScore);
 
@@ -204,13 +232,11 @@ namespace MiniMaxi.Algorithms
 						selectedMove = nextMove;
 					}
 
-					if (alfa >= beta)
-					{
-						break;
-					}
-				}
-
-				return selectedMove;
+                    if (alfa >= beta)
+                    {
+                        break;
+                    }
+                }
 			}
 			else if (currentPlayer == GamePlayer.PlayerMin)
 			{
@@ -222,9 +248,13 @@ namespace MiniMaxi.Algorithms
 
 					IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
 
-					Int32 moveScore = FindMoveScore(newState, OtherPlayer(currentPlayer), _depth - 1, alfa, beta, ratesMap);
+					Int32 moveScore = (Int32)(FindMoveScore(newState, OtherPlayer(currentPlayer), _depth - 1, alfa, beta, ratesMap) * FutureDiscount);
 
-					if (moveScore < beta || selectedMove == null)
+                    //Console.WriteLine("{0} ", moveScore);
+
+                    //Console.WriteLine(newState.ToString());
+
+                    if (moveScore < beta || selectedMove == null)
 					{
 						minMoveScore = Math.Min(minMoveScore, moveScore);
 
@@ -233,21 +263,23 @@ namespace MiniMaxi.Algorithms
 						selectedMove = nextMove;
 					}
 
-					if (alfa >= beta)
-					{
-						break;
-					}
-				}
-
-				return selectedMove;
+                    if (alfa >= beta)
+                    {
+                        break;
+                    }
+                }
 			}
 			else
 			{
 				throw new NotSupportedException(currentPlayer.ToString());
 			}
-		}
 
-		private static IGameMove ExtractResult(GamePlayer currentPlayer, IGameMove[] moves, Int32[] rates)
+            //Console.WriteLine();
+
+            return selectedMove;
+        }
+
+        private static IGameMove ExtractResult(GamePlayer currentPlayer, IGameMove[] moves, Int32[] rates)
 		{
 			Int32 index = -1;
 			Int32 rate = 0;

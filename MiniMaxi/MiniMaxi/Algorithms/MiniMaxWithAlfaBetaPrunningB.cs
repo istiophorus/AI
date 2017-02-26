@@ -75,7 +75,9 @@ namespace MiniMaxi.Algorithms
 			}
 		}
 
-		private Int32 FindMoveScore(IGameState gameState, GamePlayer currentPlayer, Int32 depth, Int32 alfa, Int32 beta)
+        private static readonly Double FutureDiscount = 0.9;
+
+        private Int32 FindMoveScore(IGameState gameState, GamePlayer currentPlayer, Int32 depth, Int32 alfa, Int32 beta)
 		{
 			if (depth <= 0 || _gameLogic.IsFinished(gameState))
 			{
@@ -101,7 +103,7 @@ namespace MiniMaxi.Algorithms
 
 					IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
 
-					Int32 moveScore = FindMoveScore(newState, OtherPlayer(currentPlayer), depth - 1, alfa, beta);
+					Int32 moveScore = (Int32)(FindMoveScore(newState, OtherPlayer(currentPlayer), depth - 1, alfa, beta) * FutureDiscount);
 
 					maxMoveScore = Math.Max(maxMoveScore, moveScore);
 
@@ -125,9 +127,9 @@ namespace MiniMaxi.Algorithms
 
 					IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
 
-					Int32 moveScore = FindMoveScore(newState, OtherPlayer(currentPlayer), depth - 1, alfa, beta);
+					Int32 moveScore = (Int32)(FindMoveScore(newState, OtherPlayer(currentPlayer), depth - 1, alfa, beta) * FutureDiscount);
 
-					minMoveScore = Math.Min(minMoveScore, moveScore);
+                    minMoveScore = Math.Min(minMoveScore, moveScore);
 
 					beta = Math.Min(beta, minMoveScore);
 
@@ -170,9 +172,9 @@ namespace MiniMaxi.Algorithms
 
 					IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
 
-					Int32 moveScore = FindMoveScore(newState, OtherPlayer(currentPlayer), _depth - 1, alfa, beta);
+					Int32 moveScore = (Int32)(FindMoveScore(newState, OtherPlayer(currentPlayer), _depth - 1, alfa, beta) * FutureDiscount);
 
-					if (moveScore > alfa || selectedMove == null)
+                    if (moveScore > alfa || selectedMove == null)
 					{
 						maxMoveScore = Math.Max(maxMoveScore, moveScore);
 
@@ -199,7 +201,7 @@ namespace MiniMaxi.Algorithms
 
 					IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
 
-					Int32 moveScore = FindMoveScore(newState, OtherPlayer(currentPlayer), _depth - 1, alfa, beta);
+					Int32 moveScore = (Int32)(FindMoveScore(newState, OtherPlayer(currentPlayer), _depth - 1, alfa, beta) * FutureDiscount);
 
 					if (moveScore < beta || selectedMove == null)
 					{

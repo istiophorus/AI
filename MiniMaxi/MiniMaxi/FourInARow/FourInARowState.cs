@@ -55,6 +55,8 @@ namespace MiniMaxi.FourInARow
             }
         }
 
+        private Int32 _lastEmptyRow = 100;
+
         internal FourInARowState(FourInARowState source)
 		{
 			if (null == source)
@@ -66,15 +68,25 @@ namespace MiniMaxi.FourInARow
 
 			_fields = new FourInARowFieldState[ColumnCount][];
 
-			for (Int32 q = 0; q < _fields.Length; q++)
+            for (Int32 q = 0; q < _fields.Length; q++)
 			{
 				_fields[q] = (FourInARowFieldState[])source._fields[q].Clone();
 			}
 
             _stateDesc = (Char[])source._stateDesc.Clone();
+
+            _lastEmptyRow = source._lastEmptyRow;
         }
 
 		private FourInARowFieldState[][] _fields;
+
+        internal Int32 LastEmptyRow
+        {
+            get
+            {
+                return _lastEmptyRow;
+            }
+        }
 
 		private Int32[] _crossesInRow = new Int32[RowCount];
 
@@ -131,6 +143,11 @@ namespace MiniMaxi.FourInARow
             _stateDesc[x + ColumnCount * y] = GetStateDesc(state);
 
 			_nextMoveIndexes[x]++;
+
+            if (y >= _lastEmptyRow)
+            {
+                _lastEmptyRow = y + 1;
+            }
 
 			if (state == FourInARowFieldState.Cross)
 			{

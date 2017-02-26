@@ -61,7 +61,7 @@ namespace MiniMaxi.FourInARow
 			{
 				FieldContext context = new FieldContext();
 
-				for (Int32 x = 0, y = startY, my = FourInARowState.RowCount, mx = FourInARowState.ColumnCount; y < my && x < mx; x++, y++)
+				for (Int32 x = 0, y = startY, my = FourInARowState.RowCount, mx = FourInARowState.ColumnCount; y < my && x < mx /* && y < state.LastEmptyRow */; x++, y++)
 				{
 					ProcessField(state, x, y, context);
 				}
@@ -73,7 +73,7 @@ namespace MiniMaxi.FourInARow
 			{
 				FieldContext context = new FieldContext();
 
-				for (Int32 x = startX, y = 0, my = FourInARowState.RowCount, mx = FourInARowState.ColumnCount; y < my && x < mx; x++, y++)
+				for (Int32 x = startX, y = 0, my = FourInARowState.RowCount, mx = FourInARowState.ColumnCount; y < my && x < mx /* && y < state.LastEmptyRow */; x++, y++)
 				{
 					ProcessField(state, x, y, context);
 				}
@@ -87,7 +87,7 @@ namespace MiniMaxi.FourInARow
 			{
 				FieldContext context = new FieldContext();
 
-				for (Int32 x = FourInARowState.ColumnCount - 1, y = startY, my = FourInARowState.RowCount; y < my && x >= 0; x--, y++)
+				for (Int32 x = FourInARowState.ColumnCount - 1, y = startY, my = FourInARowState.RowCount; y < my && x >= 0 /* && y < state.LastEmptyRow */; x--, y++)
 				{
 					ProcessField(state, x, y, context);
 				}
@@ -99,7 +99,7 @@ namespace MiniMaxi.FourInARow
 			{
 				FieldContext context = new FieldContext();
 
-				for (Int32 x = sStartX, y = 0, my = FourInARowState.RowCount; y < my && x >= 0; x--, y++)
+				for (Int32 x = sStartX, y = 0, my = FourInARowState.RowCount; y < my && x >= 0 /* && y < state.LastEmptyRow */; x--, y++)
 				{
 					ProcessField(state, x, y, context);
 				}
@@ -114,7 +114,7 @@ namespace MiniMaxi.FourInARow
 		{
 			PartialResults summary = new PartialResults();
 
-			for (Int32 y = 0, my = FourInARowState.RowCount; y < my; y++)
+			for (Int32 y = 0, my = FourInARowState.RowCount; y < my /* && y < state.LastEmptyRow */; y++)
 			{
 				FieldContext context = new FieldContext();
 
@@ -237,7 +237,7 @@ namespace MiniMaxi.FourInARow
 			{
 				FieldContext context = new FieldContext();
 
-				for (Int32 y = 0, my = FourInARowState.RowCount; y < my; y++)
+				for (Int32 y = 0, my = FourInARowState.RowCount; y < my /* && y < state.LastEmptyRow */; y++)
 				{
 					ProcessField(state, x, y, context);
 				}

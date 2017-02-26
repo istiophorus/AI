@@ -141,11 +141,13 @@ namespace MiniMaxi
 
 		private static void PlayFourInARow()
 		{
+            Console.BufferHeight = 8000;
+
 			FourInARowFactory factory = new FourInARowFactory();
 
 			IGameLogic logic = factory.CreateLogic();
 
-            IGameAlgorithm alg = new MiniMaxWithAlfaBetaPrunningDynamic(9, factory); /// new MiniMaxWithAlfaBetaPrunningB(8, factory); // new MiniMaxAlgorithmImproved(6, factory, true);
+            IGameAlgorithm alg = new MiniMaxWithAlfaBetaPrunningDynamic(3, factory); /// new MiniMaxWithAlfaBetaPrunningB(8, factory); // new MiniMaxAlgorithmImproved(6, factory, true);
 
 			IGameState state = new FourInARowState();
 

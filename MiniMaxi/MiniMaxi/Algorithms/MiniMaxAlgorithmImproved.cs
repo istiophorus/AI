@@ -64,6 +64,8 @@ namespace MiniMaxi.Algorithms
 			}
 		}
 
+        private static readonly Double FutureDiscount = 0.9;
+
 		private Int32 FindMoveScore(IGameState gameState, GamePlayer currentPlayer, Int32 depth)
 		{
 			if (depth <= 0 || _gameLogic.IsFinished(gameState))
@@ -88,7 +90,7 @@ namespace MiniMaxi.Algorithms
 
 					IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
 
-					rates[moveIndex] = FindMoveScore(newState, OtherPlayer(currentPlayer), depth - 1);
+					rates[moveIndex] = (Int32)(FindMoveScore(newState, OtherPlayer(currentPlayer), depth - 1) * FutureDiscount);
 				};
 
 			if (_useParallel)
@@ -134,7 +136,7 @@ namespace MiniMaxi.Algorithms
 
 					IGameState newState = _gameLogic.MakeMove(nextMove, gameState);
 
-					rates[moveIndex] = FindMoveScore(newState, OtherPlayer(currentPlayer), _depth - 1);
+					rates[moveIndex] = (Int32)(FindMoveScore(newState, OtherPlayer(currentPlayer), _depth - 1) * FutureDiscount);
 				};
 
 			if (_useParallel)

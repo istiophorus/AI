@@ -111,10 +111,10 @@ namespace MiniMaxi
                 new MiniMaxAlgorithmImproved(depth, gameFactory, false),
                 gameFactory);
 
-            //FourInARowMove moveB = Common(
-            //    input,
-            //    new MiniMaxWithAlfaBetaPrunningDynamic(depth, gameFactory),
-            //    gameFactory);
+            FourInARowMove moveB = Common(
+                input,
+                new MiniMaxWithAlfaBetaPrunningDynamic(depth, gameFactory),
+                gameFactory);
 
             FourInARowMove moveC = Common(
                 input,
@@ -125,7 +125,7 @@ namespace MiniMaxi
             {
             }
 
-            //            Assert.AreEqual(moveA.Column, moveB.Column, "Scenario failed [A] " + index + " " + depth);
+            Assert.AreEqual(moveA.Column, moveB.Column, "Scenario failed [A] " + index + " " + depth);
 
             Assert.AreEqual(moveA.Column, moveC.Column, "Scenario failed [B] " + index + " " + depth);
         }
@@ -144,8 +144,18 @@ namespace MiniMaxi
 
                 new[]
                 {
-                    "..oxo..",
+                    "..xxo..",
+                    "..oo...",
+                    "..xo...",
+                    "...x...",
                     ".......",
+                    "......."
+                },
+
+                new[]
+                {
+                    ".oo.oxx",
+                    ".....x.",
                     ".......",
                     ".......",
                     ".......",
@@ -154,7 +164,7 @@ namespace MiniMaxi
 
                 new[]
                 {
-                    "..ox...",
+                    ".oox.xx",
                     ".......",
                     ".......",
                     ".......",

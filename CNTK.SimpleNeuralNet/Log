@@ -1,0 +1,25 @@
+CNTK 2.0.beta5.0 (HEAD bf2ce5, Nov 25 2016 07:54:30) on OEM-Komputer at 2017/03/11 01:24:52
+
+cntk.exe  configFile=MakePrediction.cntk  makeMode=false
+
+##############################################################################
+#                                                                            #
+# Predict command (eval action)                                              #
+#                                                                            #
+##############################################################################
+
+evalNodeNames are not specified, using all the default evalnodes and training criterion nodes.
+Final Results: Minibatch[1-1]: err = 1.00000000 * 1; ce = -13.25057411 * 1; perplexity = 0.00000176
+
+
+##############################################################################
+#                                                                            #
+# WriteProbs command (write action)                                          #
+#                                                                            #
+##############################################################################
+
+Minibatch[0]: ActualMBSize = 1
+Written to Prediction_txt*
+Total Samples Evaluated = 1
+
+COMPLETED.

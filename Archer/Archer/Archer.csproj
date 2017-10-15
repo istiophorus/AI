@@ -66,6 +66,7 @@
     <Compile Include="ArcherProblemResolver.cs" />
     <Compile Include="Definitions.cs" />
     <Compile Include="IProblemSolver.cs" />
+    <Compile Include="NetworkSolutionProvider.cs" />
     <Compile Include="ProblemDefinition.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -97,13 +97,59 @@ namespace Archer
             return result;
         }
 
-        public static void Main()
+        private static void LearnMode()
         {
             List<ProblemDefinition> records = PrepareData();
 
             LearningData learningData = PrepareLearningData(records.ToArray());
 
-            TrainNetwork(learningData, @"..\Network\network.bin");
+            TrainNetwork(learningData, @"..\\Networks\\network");
+        }
+
+        private static void TestMode(string networkPath)
+        {
+
+
+            List<ProblemDefinition> records = PrepareData();
+
+            LearningData learningData = PrepareLearningData(records.ToArray());
+
+            TrainNetwork(learningData, @"..\\Networks\\network");
+        }
+
+        public static void Main(string[] args)
+        {
+            try
+            {
+                string command = null;
+
+                if (args.Length > 0)
+                {
+                    command = args[0].ToLowerInvariant();
+                }
+
+                switch (command)
+                {
+                    case "-train":
+                    case "train":
+                        LearnMode();
+                        break;
+
+                    case "-test":
+                    case "test":
+                        if (args.Length < 2)
+                        {
+                            throw new ArgumentException("Network bin path has not been provided");
+                        }
+
+                        TestMode(args[1]);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         private static double EncodeValue(double value, double minValue, double maxValue)
@@ -251,7 +297,7 @@ namespace Archer
                     counter--;
                 }
 
-                network.Save(networkPath);
+                network.Save($"{networkPath}_2_{nx}_2_{(int)error}.bin");
 
                 //Double[] output = network.Compute(learningData.Input[0]);			
             }

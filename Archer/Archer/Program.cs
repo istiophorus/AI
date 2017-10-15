@@ -36,9 +36,15 @@ namespace Archer
 
         private static readonly int MaxDistance = MinDistance + DistanceRange;
 
-        private const double Low = 0.0;
+        private const Boolean UseBipolar = true;
 
-        private const double High = 1.0;
+        private const double Margin = 0.0;
+
+        ///private const double Low = (UseBipolar ? -1.0 : 0.0) + Margin;
+
+        private const double Low = 0.0;// + Margin;
+
+        private const double High = 1.0 - Margin;
 
         private static double[][] WindSpeedWithOffsetBits = new []
         {
@@ -182,67 +188,73 @@ namespace Archer
             return problems;
         }
 
-        private static readonly Boolean UseBipolar = true;
-
         private static void TrainNetwork(LearningData learningData, String networkPath)
         {
-            ActivationNetwork network = new ActivationNetwork(
-                UseBipolar ? (IActivationFunction)new BipolarSigmoidFunction(1) : (IActivationFunction)new SigmoidFunction(),
-                2,
-                250,
-                //40,
-                2);
+            Dictionary<int, double> resultsMap = new Dictionary<int, double>();
 
-            network.Randomize();
+            int nx = 150;
 
-            Int32 epochIndex = 0;
-
-            new NguyenWidrow(network).Randomize();
-
-            //// create teacher
-            //PerceptronLearning teacher = new PerceptronLearning(network);// new BackPropagationLearning(network);
-            //PerceptronLearning teacher = new PerceptronLearning(network);// new BackPropagationLearning(network);
-            ParallelResilientBackpropagationLearning teacher = new ParallelResilientBackpropagationLearning(network);
-
-            //teacher.LearningRate = 0.0125;
-            ////teacher.Momentum = 0.5f;
-
-            Double error = Double.MaxValue;
-
-            Double previousError = Double.MaxValue;
-
-            Stopwatch sw = new Stopwatch();
-
-            Int32 counter = 100000;
-            // loop
-            while (counter > 0)
+            //for (int nx = 50; nx < 500; nx += 50)
             {
-                sw.Reset();
+                ActivationNetwork network = new ActivationNetwork(
+                    UseBipolar ? (IActivationFunction)new BipolarSigmoidFunction(1) : (IActivationFunction)new SigmoidFunction(),
+                    2,
+                    nx,
+                    2);
 
-                sw.Start();
+                network.Randomize();
 
-                // run epoch of learning procedure
-                error = teacher.RunEpoch(learningData.Input, learningData.Output);
+                Int32 epochIndex = 0;
 
-                sw.Stop();
+                new NguyenWidrow(network).Randomize();
 
-                //if (error > previousError)
-                //{
-                //	teacher.LearningRate = teacher.LearningRate * 0.5f;
-                //}
+                //// create teacher
+                //PerceptronLearning teacher = new PerceptronLearning(network);// new BackPropagationLearning(network);
+                //PerceptronLearning teacher = new PerceptronLearning(network);// new BackPropagationLearning(network);
+                ParallelResilientBackpropagationLearning teacher = new ParallelResilientBackpropagationLearning(network);
 
-                Console.WriteLine(String.Format("{0} {1} {2}", epochIndex, error, sw.Elapsed.TotalSeconds));
+                //teacher.LearningRate = 0.0125;
+                ////teacher.Momentum = 0.5f;
 
-                epochIndex++;
+                Double error = Double.MaxValue;
 
-                previousError = error;
+                Double previousError = Double.MaxValue;
 
-                counter--;
+                Stopwatch sw = new Stopwatch();
+
+                Int32 counter = 500;
+                // loop
+                while (counter > 0)
+                {
+                    sw.Reset();
+
+                    sw.Start();
+
+                    // run epoch of learning procedure
+                    error = teacher.RunEpoch(learningData.Input, learningData.Output);
+
+                    resultsMap[nx] = error;
+
+                    sw.Stop();
+
+                    //if (error > previousError)
+                    //{
+                    //	teacher.LearningRate = teacher.LearningRate * 0.5f;
+                    //}
+
+                    Console.WriteLine(String.Format("{0} {1} {2} {3}", nx, epochIndex, error, sw.Elapsed.TotalSeconds));
+
+                    epochIndex++;
+
+                    previousError = error;
+
+                    counter--;
+                }
+
+                network.Save(networkPath);
+
+                //Double[] output = network.Compute(learningData.Input[0]);			
             }
-
-            network.Save(networkPath);
-
-            //Double[] output = network.Compute(learningData.Input[0]);			
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Archer.Tests
 
             targetParameters.WindSpeed = Random.Next(40) - 20;
 
-            ProblemDefinition result = ArcherProblemResolver.ResolveProblemAdvanced(targetParameters);
+            ProblemDefinition result = new ArcherProblemResolver(new RandomSolutionProvider()).ResolveProblem(targetParameters);
 
             Assert.IsNotNull(result);
 

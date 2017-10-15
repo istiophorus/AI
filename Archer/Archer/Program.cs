@@ -92,7 +92,7 @@ namespace Archer
 
             targetParameters.WindSpeed = _random.Next(WindSpeedRange) - WindSpeedOffset;
 
-            ProblemDefinition result = ArcherProblemResolver.ResolveProblemAdvanced(targetParameters);
+            ProblemDefinition result = new ArcherProblemResolver(new RandomSolutionProvider()).ResolveProblem(targetParameters);
 
             return result;
         }

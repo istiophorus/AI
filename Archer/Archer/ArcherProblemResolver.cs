@@ -2,86 +2,96 @@
 
 namespace Archer
 {
-    public static class ArcherProblemResolver
+    public sealed class ArcherProblemResolver : IProblemSolver
     {
-        private const double MinAngle = 0.0;
-
-        private const double MaxAngle = 45.0;
-
         private static readonly Random _random = new Random(Environment.TickCount);
 
         private const double DistanceBuffer = 5.0;
 
-        public static ShootParameters ResolveProblem(TargetParameters targetParameters)
+        private readonly IProblemSolver _initialParametersProvider;
+
+        public ArcherProblemResolver(IProblemSolver initialParametersProvider)
         {
-            double initialSpeed = _random.Next(100);
-
-            double initialAngle = _random.Next((int)MaxAngle);
-
-            double distance = _random.Next(400) + 50.0;
-
-            double minAngle = MinAngle;
-
-            double currentAngle = initialAngle;
-
-            double maxAngle = MaxAngle;
-
-            bool canIncreaseSpeed = true;
-
-            int counter = 0;
-
-            while (true)
+            if (null == initialParametersProvider)
             {
-                double maxDistanceForSpeed = ShootCalculator.CalculateMaxDistance(initialSpeed, 45.0);
-
-                double timeToGround = ShootCalculator.CalculateTimeToGround(initialSpeed, currentAngle);
-
-                counter++;
-
-                if ((maxDistanceForSpeed < distance && canIncreaseSpeed))
-                {
-                    initialSpeed = initialSpeed * 1.2 + 5;
-
-                    minAngle = MinAngle;
-
-                    maxAngle = MaxAngle;
-
-                    continue;
-                }
-
-                canIncreaseSpeed = false;
-
-                double heightAtDistance = ShootCalculator.CalculateHeightAtDistance(initialSpeed, currentAngle, distance);
-
-                if (heightAtDistance >= targetParameters.TargetHeight)
-                {
-                    maxAngle = currentAngle;
-
-                    currentAngle = (maxAngle + minAngle) / 2;
-                }
-                else if (heightAtDistance <= 0.0)
-                {
-                    minAngle = currentAngle;
-
-                    currentAngle = (maxAngle + minAngle) / 2;
-                }
-                else
-                {
-                    return new ShootParameters
-                    {
-                        InitialSpeed = initialSpeed,
-                        Angle = currentAngle,
-                        Count = counter
-                    };
-                }
+                throw new ArgumentNullException(nameof(initialParametersProvider));
             }
+
+            _initialParametersProvider = initialParametersProvider;
         }
 
-        public static ProblemDefinition ResolveProblemAdvanced(TargetParameters targetParameters)
-        {
-            double initialSpeed = _random.Next(100);
+        //public static ShootParameters ResolveProblem(TargetParameters targetParameters)
+        //{
+        //    double initialSpeed = _random.Next(100);
 
-            double initialAngle = _random.Next((int)MaxAngle);
+        //    double initialAngle = _random.Next((int)Definitions.MaxAngle);
+
+        //    double distance = _random.Next(400) + 50.0;
+
+        //    double minAngle = Definitions.MinAngle;
+
+        //    double currentAngle = initialAngle;
+
+        //    double maxAngle = Definitions.MaxAngle;
+
+        //    bool canIncreaseSpeed = true;
+
+        //    int counter = 0;
+
+        //    while (true)
+        //    {
+        //        double maxDistanceForSpeed = ShootCalculator.CalculateMaxDistance(initialSpeed, 45.0);
+
+        //        double timeToGround = ShootCalculator.CalculateTimeToGround(initialSpeed, currentAngle);
+
+        //        counter++;
+
+        //        if ((maxDistanceForSpeed < distance && canIncreaseSpeed))
+        //        {
+        //            initialSpeed = initialSpeed * 1.2 + 5;
+
+        //            minAngle = Definitions.MinAngle;
+
+        //            maxAngle = Definitions.MaxAngle;
+
+        //            continue;
+        //        }
+
+        //        canIncreaseSpeed = false;
+
+        //        double heightAtDistance = ShootCalculator.CalculateHeightAtDistance(initialSpeed, currentAngle, distance);
+
+        //        if (heightAtDistance >= targetParameters.TargetHeight)
+        //        {
+        //            maxAngle = currentAngle;
+
+        //            currentAngle = (maxAngle + minAngle) / 2;
+        //        }
+        //        else if (heightAtDistance <= 0.0)
+        //        {
+        //            minAngle = currentAngle;
+
+        //            currentAngle = (maxAngle + minAngle) / 2;
+        //        }
+        //        else
+        //        {
+        //            return new ShootParameters
+        //            {
+        //                InitialSpeed = initialSpeed,
+        //                Angle = currentAngle,
+        //                Count = counter
+        //            };
+        //        }
+        //    }
+        //}
+
+        public ProblemDefinition ResolveProblem(TargetParameters targetParameters)
+        {
+            ProblemDefinition problemDefinition = _initialParametersProvider.ResolveProblem(targetParameters);
+
+            double initialSpeed = problemDefinition.Solution.InitialSpeed;
+
+            double initialAngle = problemDefinition.Solution.Angle;
 
             double currentAngle = initialAngle;
 
@@ -89,9 +99,9 @@ namespace Archer
 
             double maxDistanceForSpeed;
 
-            double minAngle = MinAngle;
+            double minAngle = Definitions.MinAngle;
 
-            double maxAngle = MaxAngle;
+            double maxAngle = Definitions.MaxAngle;
 
             do
             {

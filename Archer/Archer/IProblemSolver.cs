@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Archer
+﻿namespace Archer
 {
-    class IProblemSolver
+    public interface IProblemSolver
     {
+        ProblemDefinition ResolveProblem(TargetParameters targetParameters);
     }
 }

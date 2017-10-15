@@ -1,12 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Archer
 {
-    public sealed class RandomSolutionProvider
+    public sealed class RandomSolutionProvider : IProblemSolver
     {
+        private readonly Random _random = new Random(Environment.TickCount);
+
+        public ProblemDefinition ResolveProblem(TargetParameters targetParameters)
+        {
+            double initialSpeed = _random.Next(100);
+
+            double initialAngle = _random.Next((int)Definitions.MaxAngle);
+
+            return new ProblemDefinition
+            {
+                Conditions = targetParameters,
+                Solution = new ShootParameters
+                {
+                    Angle = initialAngle,
+                    InitialSpeed = initialSpeed,
+                    Count = 1
+                }
+            };
+        }
     }
 }

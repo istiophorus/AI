@@ -10,7 +10,7 @@ namespace Archer
         {
             double initialSpeed = _random.Next(100);
 
-            double initialAngle = _random.Next((int)Definitions.MaxAngle);
+            double initialAngle = _random.Next((int)Definitions.MaxSolutionsAngle);
 
             return new ProblemDefinition
             {

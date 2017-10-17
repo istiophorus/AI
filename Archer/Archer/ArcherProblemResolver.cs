@@ -101,7 +101,7 @@ namespace Archer
 
             double minAngle = Definitions.MinAngle;
 
-            double maxAngle = Definitions.MaxAngle;
+            double maxAngle = Definitions.MaxSolutionsAngle;
 
             do
             {

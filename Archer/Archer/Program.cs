@@ -12,75 +12,9 @@ namespace Archer
     {
         private static readonly Random _random = new Random(Environment.TickCount);
 
-        private static readonly int WindSpeedOffset = 10;
-
-        private static readonly int WindSpeedRange = 20;
-
-        private static readonly int MaxAngle = 90;
-
-        private static readonly int MinAngle = 0;
-
-        private static readonly int AngleRange = MaxAngle - MinAngle;
-
-        private static readonly int MaxWindSpeed = WindSpeedRange - WindSpeedOffset;
-
-        private static readonly int MinWindSpeed = -WindSpeedOffset;
-
-        private static readonly int MinDistance = 50;
-
-        private static readonly int MinSpeed = 0;
-
-        private static readonly int MaxSpeed = 200;
-
-        private static readonly int DistanceRange = 450;
-
-        private static readonly int MaxDistance = MinDistance + DistanceRange;
-
         private const Boolean UseBipolar = true;
 
-        private const double Margin = 0.0;
-
         ///private const double Low = (UseBipolar ? -1.0 : 0.0) + Margin;
-
-        private const double Low = 0.0;// + Margin;
-
-        private const double High = 1.0 - Margin;
-
-        private static double[][] WindSpeedWithOffsetBits = new []
-        {
-            new []{ Low, Low, Low, Low, Low },
-            new []{ Low, Low, Low, Low, High },
-            new []{ Low, Low, Low, High, Low },
-            new []{ Low, Low, Low, High, High },
-            new []{ Low, Low, High, Low, Low },
-            new []{ Low, Low, High, Low, High },
-            new []{ Low, Low, High, High, Low },
-            new []{ Low, Low, High, High, High },
-            new []{ Low, High, Low, Low, Low },
-            new []{ Low, High, Low, Low, High },
-            new []{ Low, High, Low, High, Low },
-            new []{ Low, High, Low, High, High },
-            new []{ Low, High, High, Low, Low },
-            new []{ Low, High, High, Low, High },
-            new []{ Low, High, High, High, Low },
-            new []{ Low, High, High, High, High },
-            new []{ High, Low, Low, Low, Low },
-            new []{ High, Low, Low, Low, High },
-            new []{ High, Low, Low, High, Low },
-            new []{ High, Low, Low, High, High },
-            new []{ High, Low, High, Low, Low },
-            new []{ High, Low, High, Low, High },
-            new []{ High, Low, High, High, Low },
-            new []{ High, Low, High, High, High },
-            new []{ High, High, Low, Low, Low },
-            new []{ High, High, Low, Low, High },
-            new []{ High, High, Low, High, Low },
-            new []{ High, High, Low, High, High },
-            new []{ High, High, High, Low, Low },
-            new []{ High, High, High, Low, High },
-            new []{ High, High, High, High, Low },
-            new []{ High, High, High, High, High }
-        };
 
         private static ProblemDefinition SingleTargetShootingWithWindTask()
         {
@@ -88,9 +22,9 @@ namespace Archer
 
             targetParameters.TargetHeight = 2.0;
 
-            targetParameters.TargetDistance = _random.Next(DistanceRange) + MinDistance;
+            targetParameters.TargetDistance = _random.Next(Definitions.DistanceRange) + Definitions.MinDistance;
 
-            targetParameters.WindSpeed = _random.Next(WindSpeedRange) - WindSpeedOffset;
+            targetParameters.WindSpeed = _random.Next(Definitions.WindSpeedRange) - Definitions.WindSpeedOffset;
 
             ProblemDefinition result = new ArcherProblemResolver(new RandomSolutionProvider()).ResolveProblem(targetParameters);
 
@@ -108,13 +42,13 @@ namespace Archer
 
         private static void TestMode(string networkPath)
         {
+            Network network = ActivationNetwork.Load(networkPath);
 
+            //List<ProblemDefinition> records = PrepareData();
 
-            List<ProblemDefinition> records = PrepareData();
+            //LearningData learningData = PrepareLearningData(records.ToArray());
 
-            LearningData learningData = PrepareLearningData(records.ToArray());
-
-            TrainNetwork(learningData, @"..\\Networks\\network");
+            //TrainNetwork(learningData, @"..\\Networks\\network");
         }
 
         public static void Main(string[] args)
@@ -152,40 +86,6 @@ namespace Archer
             }
         }
 
-        private static double EncodeValue(double value, double minValue, double maxValue)
-        {
-            return (value - minValue) / (maxValue - minValue) * (High - Low) + Low;
-        }
-
-        private static double[] EncodeProblemData(ProblemDefinition input)
-        {
-            double windSpeedEncoded = EncodeValue(input.Conditions.WindSpeed, MinWindSpeed, MaxWindSpeed);
-
-            double distanceEncoded = EncodeValue(input.Conditions.TargetDistance, MinDistance, MaxDistance);
-
-            return new double[] { windSpeedEncoded, distanceEncoded };
-        }
-
-        //private static double[] EncodeProblemData(ProblemDefinition input)
-        //{
-        //    int windSpeed = (int)input.Conditions.WindSpeed + WindSpeedOffset;
-
-        //    double[] windSpeedValues = WindSpeedWithOffsetBits[windSpeed];
-
-        //    List<double> result = new List<double>();
-
-        //    return result.ToArray();
-        //}
-
-        private static double[] EncodeProblemSolution(ProblemDefinition input)
-        {
-            double angleEncoded = EncodeValue(input.Solution.Angle, MinAngle, MaxAngle);
-
-            double speedEncoded = EncodeValue(input.Solution.InitialSpeed, MinSpeed, MaxSpeed);
-
-            return new double[] { angleEncoded, speedEncoded };
-        }
-
         private static LearningData PrepareLearningData(ProblemDefinition[] inputData)
         {
             Double[][] input = new Double[inputData.Length][];
@@ -194,8 +94,8 @@ namespace Archer
 
             Parallel.For(0, inputData.Length, x =>
             {
-                input[x] = EncodeProblemData(inputData[x]);
-                output[x] = EncodeProblemSolution(inputData[x]);
+                input[x] = NetworkDataEncoder.EncodeProblemData(inputData[x]);
+                output[x] = NetworkDataEncoder.EncodeProblemSolution(inputData[x]);
             });
 
             return new LearningData
@@ -203,13 +103,6 @@ namespace Archer
                 Input = input,
                 Output = output
             };
-        }
-
-        private sealed class LearningData
-        {
-            internal Double[][] Input { get; set; }
-
-            internal Double[][] Output { get; set; }
         }
 
         private static List<ProblemDefinition> PrepareData()
@@ -240,67 +133,64 @@ namespace Archer
 
             int nx = 150;
 
-            //for (int nx = 50; nx < 500; nx += 50)
+            ActivationNetwork network = new ActivationNetwork(
+                UseBipolar ? (IActivationFunction)new BipolarSigmoidFunction(1) : (IActivationFunction)new SigmoidFunction(),
+                2,
+                nx,
+                2);
+
+            network.Randomize();
+
+            Int32 epochIndex = 0;
+
+            new NguyenWidrow(network).Randomize();
+
+            //// create teacher
+            //PerceptronLearning teacher = new PerceptronLearning(network);// new BackPropagationLearning(network);
+            //PerceptronLearning teacher = new PerceptronLearning(network);// new BackPropagationLearning(network);
+            ParallelResilientBackpropagationLearning teacher = new ParallelResilientBackpropagationLearning(network);
+
+            //teacher.LearningRate = 0.0125;
+            ////teacher.Momentum = 0.5f;
+
+            Double error = Double.MaxValue;
+
+            Double previousError = Double.MaxValue;
+
+            Stopwatch sw = new Stopwatch();
+
+            Int32 counter = 500;
+            // loop
+            while (counter > 0)
             {
-                ActivationNetwork network = new ActivationNetwork(
-                    UseBipolar ? (IActivationFunction)new BipolarSigmoidFunction(1) : (IActivationFunction)new SigmoidFunction(),
-                    2,
-                    nx,
-                    2);
+                sw.Reset();
 
-                network.Randomize();
+                sw.Start();
 
-                Int32 epochIndex = 0;
+                // run epoch of learning procedure
+                error = teacher.RunEpoch(learningData.Input, learningData.Output);
 
-                new NguyenWidrow(network).Randomize();
+                resultsMap[nx] = error;
 
-                //// create teacher
-                //PerceptronLearning teacher = new PerceptronLearning(network);// new BackPropagationLearning(network);
-                //PerceptronLearning teacher = new PerceptronLearning(network);// new BackPropagationLearning(network);
-                ParallelResilientBackpropagationLearning teacher = new ParallelResilientBackpropagationLearning(network);
+                sw.Stop();
 
-                //teacher.LearningRate = 0.0125;
-                ////teacher.Momentum = 0.5f;
+                //if (error > previousError)
+                //{
+                //	teacher.LearningRate = teacher.LearningRate * 0.5f;
+                //}
 
-                Double error = Double.MaxValue;
+                Console.WriteLine(String.Format("{0} {1} {2} {3}", nx, epochIndex, error, sw.Elapsed.TotalSeconds));
 
-                Double previousError = Double.MaxValue;
+                epochIndex++;
 
-                Stopwatch sw = new Stopwatch();
+                previousError = error;
 
-                Int32 counter = 500;
-                // loop
-                while (counter > 0)
-                {
-                    sw.Reset();
-
-                    sw.Start();
-
-                    // run epoch of learning procedure
-                    error = teacher.RunEpoch(learningData.Input, learningData.Output);
-
-                    resultsMap[nx] = error;
-
-                    sw.Stop();
-
-                    //if (error > previousError)
-                    //{
-                    //	teacher.LearningRate = teacher.LearningRate * 0.5f;
-                    //}
-
-                    Console.WriteLine(String.Format("{0} {1} {2} {3}", nx, epochIndex, error, sw.Elapsed.TotalSeconds));
-
-                    epochIndex++;
-
-                    previousError = error;
-
-                    counter--;
-                }
-
-                network.Save($"{networkPath}_2_{nx}_2_{(int)error}.bin");
-
-                //Double[] output = network.Compute(learningData.Input[0]);			
+                counter--;
             }
+
+            network.Save($"{networkPath}_2_{nx}_2_{(int)error}.bin");
+
+            //Double[] output = network.Compute(learningData.Input[0]);			
         }
     }
 }

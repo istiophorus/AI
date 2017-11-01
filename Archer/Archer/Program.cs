@@ -1,9 +1,11 @@
 ﻿using Accord.Neuro;
 using Accord.Neuro.Learning;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Archer
@@ -15,16 +17,27 @@ namespace Archer
         private const Boolean UseBipolar = true;
 
         ///private const double Low = (UseBipolar ? -1.0 : 0.0) + Margin;
+        ///
 
-        private static ProblemDefinition SingleTargetShootingWithWindTask()
+        private static TargetParameters PrepareRandomTask()
         {
             TargetParameters targetParameters = new TargetParameters();
 
             targetParameters.TargetHeight = 2.0;
 
-            targetParameters.TargetDistance = _random.Next(Definitions.DistanceRange) + Definitions.MinDistance;
+            lock (_random)
+            {
+                targetParameters.TargetDistance = _random.Next(Definitions.DistanceRange) + Definitions.MinDistance;
 
-            targetParameters.WindSpeed = _random.Next(Definitions.WindSpeedRange) - Definitions.WindSpeedOffset;
+                targetParameters.WindSpeed = _random.Next(Definitions.WindSpeedRange) - Definitions.WindSpeedOffset;
+            }
+
+            return targetParameters;
+        }
+
+        private static ProblemDefinition SingleTargetShootingWithWindTask()
+        {
+            TargetParameters targetParameters = PrepareRandomTask();
 
             ProblemDefinition result = new ArcherProblemResolver(new RandomSolutionProvider()).ResolveProblem(targetParameters);
 
@@ -40,15 +53,59 @@ namespace Archer
             TrainNetwork(learningData, @"..\\Networks\\network");
         }
 
+        private static int VerifyProblemsSolutions(ProblemDefinition[] input)
+        {
+            if (null == input)
+            {
+                throw new ArgumentNullException(nameof(input));
+            }
+
+            if (input.Length <= 0)
+            {
+                throw new ArgumentException(nameof(input));
+            }
+
+            int successCounter = 0;
+
+            Parallel.ForEach(input, x =>
+            {
+                if (VerifySolution(x))
+                {
+                    Interlocked.Increment(ref successCounter);
+                }
+            });
+
+            return successCounter;
+        }
+
         private static void TestMode(string networkPath)
         {
-            Network network = ActivationNetwork.Load(networkPath);
+            IProblemSolver problemSolver = new NetworkSolutionProvider(networkPath);
 
-            //List<ProblemDefinition> records = PrepareData();
+            int testsCount = 1000000;
 
-            //LearningData learningData = PrepareLearningData(records.ToArray());
+            ConcurrentQueue<TargetParameters> parameters = new ConcurrentQueue<TargetParameters>();
 
-            //TrainNetwork(learningData, @"..\\Networks\\network");
+            Parallel.For(0, testsCount, x => parameters.Enqueue(PrepareRandomTask()));
+
+            TargetParameters[] input = parameters.ToArray();
+
+            ConcurrentQueue<ProblemDefinition> problems = new ConcurrentQueue<ProblemDefinition>();
+
+            Parallel.ForEach(input, p => problems.Enqueue(problemSolver.ResolveProblem(p)));
+
+            int successCounter = VerifyProblemsSolutions(problems.ToArray());
+
+            Console.WriteLine($"{testsCount} {successCounter} {successCounter * 1.0 / testsCount}");
+        }
+
+        private static bool VerifySolution(ProblemDefinition result)
+        {
+            ShootParameters adjusted = ShootCalculator.AdjustShootParameters(result.Solution.InitialSpeed, result.Conditions.WindSpeed, result.Solution.Angle);
+
+            double height = ShootCalculator.CalculateHeightAtDistance(adjusted.InitialSpeed, adjusted.Angle, result.Conditions.TargetDistance);
+
+            return height > 0.0 && height <= result.Conditions.TargetHeight;
         }
 
         public static void Main(string[] args)
@@ -94,8 +151,8 @@ namespace Archer
 
             Parallel.For(0, inputData.Length, x =>
             {
-                input[x] = NetworkDataEncoder.EncodeProblemData(inputData[x]);
-                output[x] = NetworkDataEncoder.EncodeProblemSolution(inputData[x]);
+                input[x] = NetworkDataEncoder.EncodeProblemData(inputData[x].Conditions);
+                output[x] = NetworkDataEncoder.EncodeProblemSolution(inputData[x].Solution);
             });
 
             return new LearningData
@@ -119,6 +176,10 @@ namespace Archer
 
                 problems.Add(definition);
             }
+
+            int successCounter = VerifyProblemsSolutions(problems.ToArray());
+
+            Console.WriteLine($"{tasksCount} {successCounter} {successCounter * 1.0 / tasksCount}");
 
             double average = problems.Select(x => x.Solution.Count).Average();
 

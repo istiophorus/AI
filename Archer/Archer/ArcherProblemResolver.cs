@@ -12,12 +12,7 @@ namespace Archer
 
         public ArcherProblemResolver(IProblemSolver initialParametersProvider)
         {
-            if (null == initialParametersProvider)
-            {
-                throw new ArgumentNullException(nameof(initialParametersProvider));
-            }
-
-            _initialParametersProvider = initialParametersProvider;
+            _initialParametersProvider = initialParametersProvider ?? throw new ArgumentNullException(nameof(initialParametersProvider));
         }
 
         //public static ShootParameters ResolveProblem(TargetParameters targetParameters)

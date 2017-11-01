@@ -7,22 +7,40 @@
             return (value - minValue) / (maxValue - minValue) * (Definitions.High - Definitions.Low) + Definitions.Low;
         }
 
-        public static double[] EncodeProblemData(ProblemDefinition input)
+        private static double DecodeValue(double value, double minValue, double maxValue)
         {
-            double windSpeedEncoded = EncodeValue(input.Conditions.WindSpeed, Definitions.MinWindSpeed, Definitions.MaxWindSpeed);
+            return (value - Definitions.Low) / (Definitions.High - Definitions.Low) * (maxValue - minValue) + minValue;
+        }
 
-            double distanceEncoded = EncodeValue(input.Conditions.TargetDistance, Definitions.MinDistance, Definitions.MaxDistance);
+        public static double[] EncodeProblemData(TargetParameters input)
+        {
+            double windSpeedEncoded = EncodeValue(input.WindSpeed, Definitions.MinWindSpeed, Definitions.MaxWindSpeed);
+
+            double distanceEncoded = EncodeValue(input.TargetDistance, Definitions.MinDistance, Definitions.MaxDistance);
 
             return new double[] { windSpeedEncoded, distanceEncoded };
         }
 
-        public static double[] EncodeProblemSolution(ProblemDefinition input)
+        public static double[] EncodeProblemSolution(ShootParameters input)
         {
-            double angleEncoded = EncodeValue(input.Solution.Angle, Definitions.MinAngle, Definitions.MaxPossibleAngle);
+            double angleEncoded = EncodeValue(input.Angle, Definitions.MinAngle, Definitions.MaxPossibleAngle);
 
-            double speedEncoded = EncodeValue(input.Solution.InitialSpeed, Definitions.MinSpeed, Definitions.MaxSpeed);
+            double speedEncoded = EncodeValue(input.InitialSpeed, Definitions.MinSpeed, Definitions.MaxSpeed);
 
             return new double[] { angleEncoded, speedEncoded };
+        }
+
+        public static ShootParameters DecodeProblemSolution(ShootParameters networkOutput)
+        {
+            double angleEncoded = DecodeValue(networkOutput.Angle, Definitions.MinAngle, Definitions.MaxPossibleAngle);
+
+            double speedEncoded = DecodeValue(networkOutput.InitialSpeed, Definitions.MinSpeed, Definitions.MaxSpeed);
+
+            return new ShootParameters
+            {
+                Angle = angleEncoded,
+                InitialSpeed = speedEncoded
+            };
         }
     }
 }

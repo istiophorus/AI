@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>-test "d:\GitHub\AI\Archer\Archer\Networks\network_2_150_2_695.bin"</StartArguments>
-  </PropertyGroup>
-</Project>
